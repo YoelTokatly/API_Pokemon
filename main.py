@@ -31,14 +31,14 @@ class pokemon_game:
         else:
             print("pokemon not in data base")
             pokemon_data = pokemon_game.api_get(rndom_pok['url'],"")
-        
+ 
             print( '=='*30)
-            print(f'id {pokemon_data['id']}')
-            print(f'name: {pokemon_data['name']}')
-            print(f'height: {pokemon_data['height']}')
-            print(f'weight: {pokemon_data['weight']}')
-            print(f'order: {pokemon_data['order']} ')
-            print(f'base_experience: {pokemon_data['base_experience']}')
+            print(f'id: {pokemon_data["id"]}')
+            print(f'name: {pokemon_data["name"]}')
+            print(f'height: {pokemon_data["height"]}')
+            print(f'weight: {pokemon_data["weight"]}')
+            print(f'order: {pokemon_data["order"]} ')
+            print(f'base_experience: {pokemon_data["base_experience"]}')
             print( '=='*30)
             # Save to database
             pokemon_game.save_to_database(pokemon_data)
