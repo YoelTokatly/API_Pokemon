@@ -42,27 +42,31 @@ def create_ec2_with_game_dependencies():
     ec2_client = boto3.client('ec2',region_name)  
 
     # Key pair name
-    key_pair_name = 'pokemon-key'
+    key_pair_name = 'pokemon-key'+ str(int(time.time()))
     key_file_path = f'{key_pair_name}.pem'
-    
-    existing_keys = ec2_client.describe_key_pairs()
-    key_exists = any(key['KeyName'] == key_pair_name for key in existing_keys.get('KeyPairs', []))
-    
-    if not key_exists:
-        print(f"Creating new key pair: {key_pair_name}")
-        response = ec2_client.create_key_pair(KeyName=key_pair_name)
-        
-        # Save the private key to a file
-        with open(key_file_path, 'w') as key_file:
+    response = ec2_client.create_key_pair(KeyName=key_pair_name)
+    with open(key_file_path, 'w') as key_file:
             key_file.write(response['KeyMaterial'])
+    os.chmod(key_file_path, 400)       
+
+    # existing_keys = ec2_client.describe_key_pairs()
+    # key_exists = any(key['KeyName'] == key_pair_name for key in existing_keys.get('KeyPairs', []))
+    
+    # if not key_exists:
+    #     print(f"Creating new key pair: {key_pair_name}")
+    #     response = ec2_client.create_key_pair(KeyName=key_pair_name)
         
-        # Set correct permissions for the key file
-        os.chmod(key_file_path, 400)
+    #     # Save the private key to a file
+    #     with open(key_file_path, 'w') as key_file:
+    #         key_file.write(response['KeyMaterial'])
         
-        print(f"Key pair created and saved to {key_file_path}")
-    else:
-        print(f"Using existing key pair: {key_pair_name}")
-        print(f"Make sure you have the private key file {key_file_path}")
+    #     # Set correct permissions for the key file
+    #     os.chmod(key_file_path, 400)
+        
+    #     print(f"Key pair created and saved to {key_file_path}")
+    # else:
+    #     print(f"Using existing key pair: {key_pair_name}")
+    #     print(f"Make sure you have the private key file {key_file_path}")
     
     
     
@@ -131,14 +135,30 @@ def create_ec2_with_game_dependencies():
             ]
         )
         print(f"Security group created with SSH access: {security_group_id}")
-    
+    #seperate to a file
+
     # Bash script to install dependencies and setup your Python game
-    user_data_script = """#!/bin/bash
+    user_data_script = user_data_script.txt
+    """#!/bin/bash
     # Update package lists
     sudo yum  update -y
+
+    # amazon-linux-extras enable python3.9
+
+    yum install -y python3.9
     
-    # Install Python and pip
-    sudo yum  install -y python3 python3-pip
+    # Create symbolic links to make this the default python3
+    # alternatives --set python3 /usr/bin/python3.9
+    
+    # Install pip for this specific version
+    python3.9 -m ensurepip --upgrade
+    python3.9 -m pip install --upgrade pip
+    
+    # Create a virtual environment with this specific Python version
+    python3.9 -m venv /opt/python-game/venv
+
+    source /opt/python-game/venv/bin/activate
+    pip install pandas numpy pygame
 
     # Install git
     sudo yum  install -y git
@@ -150,14 +170,14 @@ def create_ec2_with_game_dependencies():
     # mkdir -p /opt/API_POKEMON
 
     # clone from git
-    git clone https://github.com/YoelTokatly/API_Pokemon.git /opt/python-game
+    git clone https://github.com/YoelTokatly/API_Pokemon.git /opt/python-game/API_Pokemon
 
-    chmod -p 777 pokemon2.db
+    sudo chmod -p 400 pokemon2.db
 
     # Install Python game dependencies
-    pip install --upgrade pip
-    pip install -r /opt/python-game/requirements.txt
-    pip install pygame numpy pandas sqlite3 requests random json
+    pip3 install --upgrade pip
+    pip3 install -r /opt/python-game/API_Pokemon/requirements.txt
+    pip3 install pygame numpy pandas sqlite3 requests random json
 
     
 
