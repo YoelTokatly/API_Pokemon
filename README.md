@@ -1,6 +1,8 @@
 # API Pokemon Project
 
-A simple Python application that interacts with the PokeAPI to randomly draw Pokemon cards and save their data to a local SQLite database. The project includes automated AWS deployment capabilities.
+A simple Python application that interacts with the PokeAPI to randomly draw Pokemon cards and save their data to a local SQLite database.
+
+The project includes automated AWS deployment capabilities.
 
 ## Project Overview
 
